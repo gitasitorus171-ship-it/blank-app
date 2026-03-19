@@ -1,0 +1,146 @@
+# =============================
+# STREAMLIT APP - MOBILE STYLE + PROGRESS TRACKER
+# DPL RESEARCH ROOM
+# =============================
+
+import streamlit as st
+import random
+
+st.set_page_config(page_title="DPL Research Room", page_icon="📱", layout="centered")
+
+# ===== Session State =====
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "files" not in st.session_state:
+    st.session_state.files = []
+
+if "progress" not in st.session_state:
+    st.session_state.progress = 0
+
+# ===== Quotes & Fun Messages =====
+quotes = [
+    "Pergi ke kampus naik sepeda,
+Kerjakan skripsi biar cepat wisuda 😄",
+    "Beli kopi di pagi hari,
+Kerjakan sedikit tiap hari biar cepat jadi ☕",
+    "Jalan-jalan ke kota Medan,
+Jangan ditunda, nanti keteteran 😆",
+    "Makan mie pakai telur,
+Kerjakan pelan asal teratur 🍜",
+    "Pergi ke pasar membeli buku,
+Sedikit progres hari ini, besok makin maju 📚",
+    "Main HP jangan kelamaan,
+Ingat skripsi harus diselesaikan 😜",
+    "Beli pensil di toko seberang,
+Revisi sedikit, lama-lama hilang 📝",
+    "Naik motor ke rumah teman,
+Kerjakan sekarang, jangan nanti-nanti ya kan 😁"
+]
+
+# ===== Custom Style =====
+st.markdown("""
+<style>
+.main {
+    background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%);
+}
+.title {
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+}
+.subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 18px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    margin-top: 15px;
+}
+.chat-box {
+    height: 250px;
+    overflow-y: auto;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ===== Navigation =====
+menu = st.radio("", ["🏠 Home", "📄 Dokumen", "💬 Diskusi", "📊 Progress"], horizontal=True)
+
+# ===== HOME =====
+if menu == "🏠 Home":
+    st.markdown('<div class="title">📚 DPL Research Room</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">Welcome Ibu DPL 💐</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="card">
+    <b>Ruang Diskusi Eksklusif</b>
+    <p>
+    Tempat khusus untuk kolaborasi penelitian antara mahasiswa dan Ibu DPL.
+    Semua dokumen dan diskusi tersimpan rapi dalam satu ruang.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ===== DOKUMEN =====
+elif menu == "📄 Dokumen":
+    st.markdown("### 📄 Manajemen Dokumen")
+
+    uploaded_file = st.file_uploader("Upload Dokumen", type=None)
+
+    if uploaded_file:
+        st.session_state.files.append(uploaded_file.name)
+        st.success(f"File '{uploaded_file.name}' berhasil diupload!")
+
+    st.markdown("#### 📂 Daftar Dokumen")
+    for f in st.session_state.files:
+        st.markdown(f"- {f}")
+
+# ===== DISKUSI =====
+elif menu == "💬 Diskusi":
+    st.markdown("### 💬 Diskusi dengan Ibu DPL")
+
+    st.markdown('<div class="card chat-box">', unsafe_allow_html=True)
+    for msg in st.session_state.messages:
+        st.write(f"**{msg['user']}**: {msg['text']}")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    user_input = st.text_input("Tulis pesan...")
+
+    if st.button("Kirim"):
+        if user_input:
+            st.session_state.messages.append({"user": "Mahasiswa", "text": user_input})
+            st.rerun()
+
+# ===== PROGRESS TRACKER =====
+elif menu == "📊 Progress":
+    st.markdown("### 📊 Progress Penelitian")
+
+    progress = st.slider("Seberapa jauh progres penelitian? (%)", 0, 100, st.session_state.progress)
+    st.session_state.progress = progress
+
+    st.progress(progress / 100)
+
+    if progress > 0:
+        st.success(f"Progress kamu: {progress}% 🎉")
+
+        # Show random quote
+        st.markdown("""
+        <div class="card">
+        <b>💡 Penyemangat Hari Ini</b>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.info(random.choice(quotes))
+
+        # Fun reward
+        if progress >= 50:
+            st.balloons()
+
+# ===== FOOTER =====
+st.markdown("---")
+st.caption("Private • Secure • DPL Research Room")
